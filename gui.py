@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog
 from pyqtgraph.Qt import QtGui
 import numpy as np
 import prepare
+import scipy
 
 FILENAME = ""
 LOADED_PIC_SIZE = 300
@@ -107,7 +108,9 @@ class App(QWidget):
 		blur = self.parameters.child('blur coefficient').value()
 		sharp = self.parameters.child('sharp coefficient').value()
 		norm = self.parameters.child('color histogram normalization').value()
+		#self.img = scipy.misc.face(gray=True).astype(float)
 		self.img = prepare.blur(self.img,blur)
+		self.image = prepare.sharp(self.img,sharp)
 		self.imageView.setImage(self.img)
 		self.applyButton.setEnabled(True)
 
