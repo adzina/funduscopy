@@ -103,9 +103,13 @@ class App(QWidget):
 	
 	@pyqtSlot()
 	def applyClickAction(self):
-		blurr = self.parameters.child('blur coefficient').value()
+		self.applyButton.setEnabled(False)
+		blur = self.parameters.child('blur coefficient').value()
 		sharp = self.parameters.child('sharp coefficient').value()
 		norm = self.parameters.child('color histogram normalization').value()
+		self.img = prepare.blur(self.img,blur)
+		self.imageView.setImage(self.img)
+		self.applyButton.setEnabled(True)
 
 def startApp():
 	app = QApplication(sys.argv)
