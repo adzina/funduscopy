@@ -1,16 +1,23 @@
 import sys
-import scipy
 from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pyplot as plt
-import numpy
+from skimage import exposure
+import numpy as np
+from PIL import Image, ImageOps, ImageFilter
 
-def blur(img:numpy.ndarray, sig:float):
-	blurred = gaussian_filter(img,sigma=sig)
+from scipy import misc,ndimage
+
+def norm(img):
+	img = img.convert(mode="RGB")
+	img_norm = ImageOps.equalize(img)
+	return img_norm
+	
+def blur(img:np.ndarray, sig:float):
+	
+	blurred = img.filter(ImageFilter.GaussianBlur(sig))
 	return blurred
 	
-def sharp(img:numpy.ndarray, alpha:float):
-	img=img.astype(float)
-	blurred = gaussian_filter(img, 3)
-	filter_blurred = gaussian_filter(blurred, 1)
-	sharpened = blurred + alpha * (blurred - filter_blurred)
+def sharp(img:np.ndarray):
+	
+	sharpened = img.filter(ImageFilter.SHARPEN)
 	return sharpened

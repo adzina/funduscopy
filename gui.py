@@ -1,13 +1,20 @@
 import sys
 
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PIL import ImageFilter
+from PIL import ImageOps
+
 import matplotlib.pyplot as plt
 import pyqtgraph as pg
 from PyQt5.QtCore import pyqtSlot
+from PIL.ImageQt import ImageQt
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog
 from pyqtgraph.Qt import QtGui
 import numpy as np
 import prepare
 import scipy
+from PIL import Image
 
 FILENAME = ""
 LOADED_PIC_SIZE = 300
@@ -15,7 +22,7 @@ RESULT_PIC_SIZE = 300
 result_img = ""
 PLAY_RATE = 5
 
-
+		
 class App(QWidget):
 
 	def __init__(self):
@@ -41,8 +48,8 @@ class App(QWidget):
 		self.imageView.setToolTip('The loaded image will appear here.')
 
 		param_tree = (
-			{'name': 'blur coefficient', 'type': 'float', 'value': 5.0},
-			{'name': 'sharp coefficient', 'type': 'float', 'value': 5.0},
+			{'name': 'blur coefficient', 'type': 'float', 'value': 0.1},
+			{'name': 'sharp coefficient', 'type': 'bool', 'value': True},
 			{'name': 'color histogram normalization', 'type' : 'bool', 'value': True}
 		)
 		self.parameters = pg.parametertree.Parameter.create(name='Settings', type='group', children=param_tree)
@@ -76,6 +83,7 @@ class App(QWidget):
 		self.layout.addWidget(self.startButton)
 
 		self.show()
+		
 
 	@pyqtSlot()
 	def loadClickAction(self):
@@ -84,14 +92,11 @@ class App(QWidget):
 		FILENAME = QFileDialog.getOpenFileName(filter="Images (*.png *.jpg)")[0]
 		if FILENAME == '': return
 		print(FILENAME)
-
-		self.img = plt.imread(FILENAME)    
 		
-		if len(self.img.shape) == 3:  # RGB
-		    self.img = self.img[:, :, 0]
-		assert len(self.img.shape) == 2
+		self.img = Image.open(FILENAME)
 		
-		self.imageView.setImage(self.img)
+		to_disp = np.array(self.img)
+		self.imageView.setImage(to_disp)
 
 		self.startButton.setEnabled(True)
 		self.applyButton.setEnabled(True)
@@ -108,10 +113,14 @@ class App(QWidget):
 		blur = self.parameters.child('blur coefficient').value()
 		sharp = self.parameters.child('sharp coefficient').value()
 		norm = self.parameters.child('color histogram normalization').value()
-		#self.img = scipy.misc.face(gray=True).astype(float)
 		self.img = prepare.blur(self.img,blur)
-		self.image = prepare.sharp(self.img,sharp)
-		self.imageView.setImage(self.img)
+		if(sharp):
+			self.img = prepare.sharp(self.img)
+		
+		if(norm):
+			self.img = prepare.norm(self.img)
+		to_disp = np.array(self.img)	
+		self.imageView.setImage(to_disp)
 		self.applyButton.setEnabled(True)
 
 def startApp():
