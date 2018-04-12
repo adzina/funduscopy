@@ -22,12 +22,12 @@ RESULT_PIC_SIZE = 300
 result_img = ""
 PLAY_RATE = 5
 
-		
+
 class App(QWidget):
 
 	def __init__(self):
 		QWidget.__init__(self)
-		self.title = 'Tomograph Simulator'
+		self.title = 'Fundoscopy'
 		self.left = 10
 		self.top = 10
 		self.width = 640
@@ -89,7 +89,7 @@ class App(QWidget):
 	def loadClickAction(self):
 		global FILENAME
 		print('load image')
-		FILENAME = QFileDialog.getOpenFileName(filter="Images (*.png *.jpg)")[0]
+		FILENAME = QFileDialog.getOpenFileName(filter="Images (*.png *.jpg *.ppm)")[0]
 		if FILENAME == '': return
 		print(FILENAME)
 		
