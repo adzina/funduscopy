@@ -58,7 +58,30 @@ def countFundusNeighbours(array, coords):
 
     return fundusNeighbours, allNeighbours
 
+def countPixelParameters(array, coords):
+	'''Returns an array of parameters for a given pixel
+		[fundusNeighbours, Hu moment, colour variance]
+	'''
+	fundusNeighbours = countFundusNeighbours(array,coords)
+	# huMoment = countHuMoment(array,coords)
+	huMoment = 0
+	# colourVar = countColourVar(arry,coords)
+	colourVar = 0
+	
+	return [fundusNeighbours, huMoment, colourVar]
 
+def countAllParameters(array):
+	'''
+	 Every pixel is converted to an array of parameters
+	'''
+	paramArray = []
+	for x in range(len(array)):
+		row=[]
+		for y in range(len(array[0])):
+			c=[x,y]
+			row.append(countPixelParameters(array,c))
+		paramArray.append(row)
+	return paramArray	
 if __name__ == "__main__":
     # main function for tests
     test = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15], [16,17,18,19,20], [21,22,23,24,25]]
