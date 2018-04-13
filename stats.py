@@ -34,7 +34,7 @@ def fundusDatabase(array, pixelNumber):
         if isThatFundus(c, array):
             if "fundus" in db.keys(): lst = db["fundus"]
             lst.append(c)
-            db.update({"funds": lst})
+            db.update({"fundus": lst})
         else:
             if "else" in db.keys(): lst = db["else"]
             lst.append(c)
