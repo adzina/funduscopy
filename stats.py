@@ -47,8 +47,8 @@ def countFundusNeighbours(array, coords):
     allNeighbours = 0
     fundusNeighbours = 0
 
-    for x in range(coords[0]-1, coords[0]+2):
-        for y in range(coords[1]-1, coords[1]+2):
+    for x in range(coords[0]-4, coords[0]+5):
+        for y in range(coords[1]-4, coords[1]+5):
             if x >= 0 and y >= 0 and x < len(array) and y < len(array[0]):
                 if x == coords[0] and y == coords[1]:
                     continue  # skip start coords
