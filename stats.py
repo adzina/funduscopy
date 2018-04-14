@@ -1,6 +1,7 @@
 import random
 import numpy as np
-
+import math
+import operator
 
 def randPixels(array, pixelNumber):
     """Picks pixelNumber items from 2d array. Returns list of coords (pairs)."""
@@ -63,6 +64,7 @@ def countPixelParameters(array, coords):
 		[fundusNeighbours, Hu moment, colour variance]
 	'''
 	fundusNeighbours = countFundusNeighbours(array,coords)
+	fundusNeighbours = 0
 	# huMoment = countHuMoment(array,coords)
 	huMoment = 0
 	# colourVar = countColourVar(arry,coords)
@@ -82,9 +84,35 @@ def countAllParameters(array):
 			row.append(countPixelParameters(array,c))
 		paramArray.append(row)
 	return paramArray	
+	
+def euclideanDistance(pixel1, pixel2, length):
+	'''
+	Returns euclidian distance between two pixels.
+	Length is the number of properties each pixel has.
+	'''
+	distance = 0
+	for x in range(length):
+		distance += pow((pixel1[x] - pixel2[x]), 2)
+	return math.sqrt(distance)	
+	
+def getNeighbours(trainingSet, pixel, k):
+	'''
+	Returns k closest neighbours of a pixel.
+	'''
+	distances = []
+	length = len(pixel)-1
+	for x in range(len(trainingSet)):
+		dist = euclideanDistance(pixel, trainingSet[x], length)
+		distances.append((trainingSet[x], dist))
+	distances.sort(key=operator.itemgetter(1))
+	neighbours = []
+	for x in range(k):
+		neighbours.append(distances[x][0])
+	return neighbours	
 if __name__ == "__main__":
     # main function for tests
     test = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15], [16,17,18,19,20], [21,22,23,24,25]]
-    # a,b = countFundusNeighbours(test, [0,0])
-    # print(a)
-    # print(b)
+    a = [2,3,4,5,6]
+    neighbours = getNeighbours(test, a,2)
+    print(neighbours)
+    
