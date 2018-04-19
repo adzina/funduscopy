@@ -96,7 +96,9 @@ class App(QWidget):
     @pyqtSlot()
     def startClickAction(self):
         global result_img
+        binary = stats.generateBinaryImage(self.img)
         self.startButton.setEnabled(False)
+        self.resultView.setImage(binary)
 
     @pyqtSlot()
     def applyClickAction(self):

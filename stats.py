@@ -109,6 +109,19 @@ def getNeighbours(trainingSet, pixel, k):
 	for x in range(k):
 		neighbours.append(distances[x][0])
 	return neighbours	
+def generateBinaryImage(image):
+	image=np.array(image)
+	binary=np.zeros(image.shape)
+	for x in range(len(image)):
+		row=[]
+		for y in range(len(image[0])):
+			c=[x,y]
+			if(isThatFundus(c,image)):
+				binary[x][y]=[255,255,255]
+			else:
+				binary[x][y]=[0,0,0]
+		
+	return binary			
 if __name__ == "__main__":
     # main function for tests
     test = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15], [16,17,18,19,20], [21,22,23,24,25]]
