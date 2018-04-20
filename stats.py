@@ -109,19 +109,41 @@ def getNeighbours(trainingSet, pixel, k):
 	for x in range(k):
 		neighbours.append(distances[x][0])
 	return neighbours	
+	
+def predictFundus(coords, paramArray):
+	fundus = 0
+	nonFundus = 0
+	k=4
+	neighbours = getNeighbours(trainingSet, paramArray[coords[0],coords[1]],k)
+	for i in neighbours:
+		if(i[3]==1) #isFundus
+			fundus+=1
+		else:
+			nonFundus+=1
+	return fundus>nonFundus		
 def generateBinaryImage(image):
+	paramArray = countAllParameters(image)
 	image=np.array(image)
 	binary=np.zeros(image.shape)
 	for x in range(len(image)):
 		row=[]
 		for y in range(len(image[0])):
 			c=[x,y]
-			if(isThatFundus(c,image)):
+			if(predictFundus(c,paramArray)):
 				binary[x][y]=[255,255,255]
 			else:
 				binary[x][y]=[0,0,0]
 		
-	return binary			
+	return binary	
+'''
+1. upload training images
+2. choose 500 nonFundus pixels and 500 fundus pixels
+3. create training set: [params[0], params[1], params[2], isFundus]       isFundus: 0 or 1
+4. upload test image
+5. for every pixel calculate params, test set: [params[0], params[1], params[2]]
+6. find k nearest neighbours and decide if it is fundus or not
+7. generate binary image
+'''	
 if __name__ == "__main__":
     # main function for tests
     test = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15], [16,17,18,19,20], [21,22,23,24,25]]
