@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
         file.write("[")
         testPixels = db['fundus'][:500]+db['else'][:500]
-        sep=","
+        sep=", "
         for c in testPixels:
             if c == testPixels[-1]: sep=""
             file.write(str(stats.countPixelParameters(baseImg, resultImg, c)) + sep)
