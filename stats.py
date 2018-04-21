@@ -4,6 +4,7 @@ import math
 import operator
 import cv2
 
+
 def randPixels(array, pixelNumber):
     """Picks pixelNumber items from 2d array. Returns list of coords (pairs)."""
     x = len(array)
@@ -45,30 +46,29 @@ def fundusDatabase(array, pixelNumber):
     return db
 
 
-def countFundusNeighbours(array, coords):
+def countFundusNeighbours(array):
     allNeighbours = 0
     fundusNeighbours = 0
 
-    for x in range(coords[0]-4, coords[0]+5):
-        for y in range(coords[1]-4, coords[1]+5):
-            if x >= 0 and y >= 0 and x < len(array) and y < len(array[0]):
-                if x == coords[0] and y == coords[1]:
-                    continue  # skip start coords
-                allNeighbours += 1
-                if isThatFundus([x, y], array):
-                    fundusNeighbours += 1
+    for x in range(len(array)):
+        for y in range(len(array[0])):
+        #     if x >= 0 and y >= 0 and x < len(array) and y < len(array[0]):
+            if x == y == 4:
+                continue  # skip start coords
+            allNeighbours += 1
+            if isThatFundus([x, y], array):
+                fundusNeighbours += 1
 
     return fundusNeighbours, allNeighbours
 
 
 def countHuMoments(array, coords):
-    array = cut9x9FromArray(array, coords)
+    array = np.array(array)
     array = cv2.cvtColor(array, cv2.COLOR_BGR2GRAY)
     return cv2.HuMoments(cv2.moments(array)).flatten()
 
 
 def countVariance(array, coords):
-    array = cut9x9FromArray(array, coords)
     return np.var(array)
 
 
@@ -87,31 +87,34 @@ def cut9x9FromArray(array, coords):
     return result
 
 
-def countPixelParameters(array, coords):
+def countPixelParameters(baseArray, resultArray, coords):
     '''Returns an array of parameters for a given pixel
         [fundusNeighbours, Hu moment, colour variance]
     '''
-    fundusNeighbours = countFundusNeighbours(array,coords)
-    fundusNeighbours = 0
-    # huMoment = countHuMoment(array,coords)
-    huMoment = 0
-    # colourVar = countColourVar(arry,coords)
-    colourVar = 0
+    baseArray = cut9x9FromArray(baseArray, coords)
+    resultArray = cut9x9FromArray(resultArray, coords)
 
-    return [fundusNeighbours, huMoment, colourVar]
+    fundus = isThatFundus([4, 4], resultArray)
+    fundusNeighbours = countFundusNeighbours(resultArray)
+    huMoments = countHuMoments(baseArray, coords)
+    colourVar = countVariance(baseArray, coords)
 
-def countAllParameters(array):
+    return [fundus, fundusNeighbours, huMoments, colourVar]
+
+
+def countAllParameters(baseArray, resultArray):
     '''
      Every pixel is converted to an array of parameters
     '''
     paramArray = []
-    for x in range(len(array)):
+    for x in range(len(baseArray)):
         row=[]
-        for y in range(len(array[0])):
+        for y in range(len(baseArray[0])):
             c=[x,y]
-            row.append(countPixelParameters(array,c))
+            row.append(countPixelParameters(baseArray, resultArray, c))
         paramArray.append(row)
     return paramArray
+
 
 def euclideanDistance(pixel1, pixel2, length):
     '''
@@ -122,6 +125,7 @@ def euclideanDistance(pixel1, pixel2, length):
     for x in range(length):
         distance += pow((pixel1[x] - pixel2[x]), 2)
     return math.sqrt(distance)
+
 
 def getNeighbours(trainingSet, pixel, k):
     '''
@@ -138,6 +142,7 @@ def getNeighbours(trainingSet, pixel, k):
         neighbours.append(distances[x][0])
     return neighbours
 
+
 def predictFundus(coords, paramArray):
     fundus = 0
     nonFundus = 0
@@ -149,6 +154,7 @@ def predictFundus(coords, paramArray):
         else:
             nonFundus+=1
     return fundus>nonFundus
+
 
 def generateBinaryImage(image):
     paramArray = countAllParameters(image)
