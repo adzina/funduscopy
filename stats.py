@@ -3,6 +3,7 @@ import numpy as np
 import math
 import operator
 import cv2
+import testData
 
 
 def randPixels(array, pixelNumber):
@@ -144,7 +145,7 @@ def getNeighbours(trainingSet, pixel, k):
     distances = []
     length = len(pixel)-1
     for x in range(len(trainingSet)):
-        dist = euclideanDistance(pixel, trainingSet[x], length)
+        dist = euclideanDistance(pixel, trainingSet[x][1:], length)
         distances.append((trainingSet[x], dist))
     distances.sort(key=operator.itemgetter(1))
     neighbours = []
@@ -154,12 +155,13 @@ def getNeighbours(trainingSet, pixel, k):
 
 
 def predictFundus(coords, paramArray):
+    trainingSet = testData.readTrainingSet()
     fundus = 0
     nonFundus = 0
     k=4
     neighbours = getNeighbours(trainingSet, paramArray[coords[0],coords[1]],k)
     for i in neighbours:
-        if(i[3]==1): #isFundus
+        if i[0]==True: #isFundus
             fundus+=1
         else:
             nonFundus+=1
@@ -171,23 +173,22 @@ def generateBinaryImage(image):
     image=np.array(image)
     binary=np.zeros(image.shape)
     for x in range(len(image)):
-        row=[]
         for y in range(len(image[0])):
             c=[x,y]
-            if(predictFundus(c,paramArray)):
+            if predictFundus(c,paramArray):
                 binary[x][y]=[255,255,255]
             else:
                 binary[x][y]=[0,0,0]
 
     return binary
 '''
-1. upload training images
-2. choose 500 nonFundus pixels and 500 fundus pixels
-3. create training set: [params[0], params[1], params[2], isFundus]       isFundus: 0 or 1
-4. upload test image
-5. for every pixel calculate params, test set: [params[0], params[1], params[2]]
-6. find k nearest neighbours and decide if it is fundus or not
-7. generate binary image
+1. upload training images                                                                   DONE
+2. choose 500 nonFundus pixels and 500 fundus pixels                                        DONE
+3. create training set: [params[0], params[1], params[2], isFundus]       isFundus: 0 or 1  DONE
+4. upload test image                                                                        DONE
+5. for every pixel calculate params, test set: [params[0], params[1], params[2]]            DONE
+6. find k nearest neighbours and decide if it is fundus or not                              DONE
+7. generate binary image                                                                    DONE
 '''	
 if __name__ == "__main__":
     # main function for tests
