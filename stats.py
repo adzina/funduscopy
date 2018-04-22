@@ -122,10 +122,20 @@ def euclideanDistance(pixel1, pixel2, length):
     Length is the number of properties each pixel has.
     '''
     distance = 0
-    for x in range(length):
-        distance += pow((pixel1[x] - pixel2[x]), 2)
+    # (fundusNeighbours1/allNeighbours1 - fundusNeighbours2/allNeighbours2)^2
+    distance += pow((pixel1[0][0]/pixel1[0][1] - pixel2[0][0]/pixel2[0][1]),2)
+    # sum of distances of every hu value
+    distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2)
+    # distance between variances
+    distance += pow((pixel1[2] - pixel2[2]), 2)
+
     return math.sqrt(distance)
 
+def euclidianDistanceHu(hu1, hu2):
+    distance = 0
+    for i in range(7):
+        distance += pow((hu1[i]-hu2[i]),2)
+    return math.sqrt(distance)
 
 def getNeighbours(trainingSet, pixel, k):
     '''
