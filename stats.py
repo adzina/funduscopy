@@ -73,13 +73,13 @@ def countVariance(array, coords):
     return np.var(array)
 
 
-def cut9x9FromArray(array, coords):
-    """Returns 9x9 square from given array (or less when start point is close to the edge)"""
+def cut25x25FromArray(array, coords):
+    """Returns 25x25 square from given array (or less when start point is close to the edge)"""
     result = []
     pom = []
 
-    for x in range(coords[0]-4, coords[0]+5):
-        for y in range(coords[1]-4, coords[1]+5):
+    for x in range(coords[0]-12, coords[0]+13):
+        for y in range(coords[1]-12, coords[1]+13):
             if x >= 0 and y >= 0 and x < len(array) and y < len(array[0]):
                 pom.append(array[x][y])
         if pom != []: result.append(pom)
