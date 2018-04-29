@@ -84,8 +84,24 @@ def countPixelParameters(baseArray, coords):
     #huMoments = countHuMoments(baseArray)
     huMoments = [0,0,0,0,0,0,0]
     colourVar = countVariance(baseArray)
+	average, huMoments, colourVar = scaleParameters(average, huMoments, colourVar)
     return [average, huMoments, colourVar]
 
+def scaleParameters(average, huMoments, colourVar):
+    '''Scales the parameters so that all contain values between roughly 0 and 1'''
+    colourVar = colourVar/10000
+    average = average/255
+	hu_min_max= [[1.3e-03,2.7e-03],[8.0e-13,9.0e-08],[2.0e-15,2.1e-07],[1.0e-14, 2.0e-11],[-2.4e-28,1.5e-22],[-9.0e-19, 5.8e-16],[-3.5e-23, 4.5e-23]]
+    
+	for i in range(len(huMoments)):
+		hu_min = hu_min_max[i][0]
+		hu_max = hu_min_max[i][1]
+		scope = (hu_max - hu_min)
+		part = huMoments[i] - hu_min
+
+		huMoments[i] = part/scope
+	
+	return (average, huMoments, colourVar)
 
 def countAllParameters(baseArray):
     '''
