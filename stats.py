@@ -63,15 +63,18 @@ def countFundusNeighbours(array):
     return fundusNeighbours, allNeighbours
 
 
-def countHuMoments(array, coords):
+def countHuMoments(array):
     array = np.array(array)
     array = cv2.cvtColor(array, cv2.COLOR_BGR2GRAY)
     return cv2.HuMoments(cv2.moments(array)).flatten()
 
 
-def countVariance(array, coords):
+def countVariance(array):
     return np.var(array)
 
+def countAverage(array):
+    '''returns mean value for r g b in form [mean_r mean_g mean_b]'''
+    return array.mean(axis=(0))
 
 def cut25x25FromArray(array, coords):
     """Returns 25x25 square from given array (or less when start point is close to the edge)"""
@@ -88,22 +91,18 @@ def cut25x25FromArray(array, coords):
     return result
 
 
-def countPixelParameters(baseArray, resultArray, coords):
+def countPixelParameters(baseArray, coords):
     '''Returns an array of parameters for a given pixel
         [fundusNeighbours, Hu moment, colour variance]
     '''
-    baseArray = cut9x9FromArray(baseArray, coords)
-    resultArray = cut9x9FromArray(resultArray, coords)
-
-    fundus = isThatFundus([4, 4], resultArray)
-    fundusNeighbours = countFundusNeighbours(resultArray)
-    huMoments = countHuMoments(baseArray, coords)
-    colourVar = countVariance(baseArray, coords)
+    baseArray = cut25x25FromArray(baseArray, coords)
+    huMoments = countHuMoments(baseArray)
+    colourVar = countVariance(baseArray)
 
     return [fundus, fundusNeighbours, huMoments, colourVar]
 
 
-def countAllParameters(baseArray, resultArray):
+def countAllParameters(baseArray):
     '''
      Every pixel is converted to an array of parameters
     '''
@@ -112,15 +111,14 @@ def countAllParameters(baseArray, resultArray):
         row=[]
         for y in range(len(baseArray[0])):
             c=[x,y]
-            row.append(countPixelParameters(baseArray, resultArray, c))
+            row.append(countPixelParameters(baseArray, c))
         paramArray.append(row)
     return paramArray
 
 
-def euclideanDistance(pixel1, pixel2, length):
+def euclideanDistance(pixel1, pixel2):
     '''
     Returns euclidian distance between two pixels.
-    Length is the number of properties each pixel has.
     '''
     distance = 0
     # (fundusNeighbours1/allNeighbours1 - fundusNeighbours2/allNeighbours2)^2
@@ -133,6 +131,9 @@ def euclideanDistance(pixel1, pixel2, length):
     return math.sqrt(distance)
 
 def euclidianDistanceHu(hu1, hu2):
+    '''
+        Returns euclidian distance between twoarrays of hu moments.
+        '''
     distance = 0
     for i in range(7):
         distance += pow((hu1[i]-hu2[i]),2)
@@ -145,7 +146,7 @@ def getNeighbours(trainingSet, pixel, k):
     distances = []
     length = len(pixel)-1
     for x in range(len(trainingSet)):
-        dist = euclideanDistance(pixel, trainingSet[x][1:], length)
+        dist = euclideanDistance(pixel, trainingSet[x][1:])
         distances.append((trainingSet[x], dist))
     distances.sort(key=operator.itemgetter(1))
     neighbours = []
@@ -181,24 +182,19 @@ def generateBinaryImage(image):
                 binary[x][y]=[0,0,0]
 
     return binary
-'''
-1. upload training images                                                                   DONE
-2. choose 500 nonFundus pixels and 500 fundus pixels                                        DONE
-3. create training set: [params[0], params[1], params[2], isFundus]       isFundus: 0 or 1  DONE
-4. upload test image                                                                        DONE
-5. for every pixel calculate params, test set: [params[0], params[1], params[2]]            DONE
-6. find k nearest neighbours and decide if it is fundus or not                              DONE
-7. generate binary image                                                                    DONE
-'''	
+
 if __name__ == "__main__":
     # main function for tests
     test = []
     pom = []
     for x in range(12):
-        for y in range(12):
+        for y in range(3):
             pom.append(x)
         test.append(pom)
         pom = []
-    print(test)
-    print(cut9x9FromArray(test, [11, 11]))
+    print(cut25x25FromArray(test, [11, 11]))
+    cut = cut25x25FromArray(test, [11, 11])
+    cut = np.array(cut)
+    print(cut)
+    print(countAverage(cut))
 
