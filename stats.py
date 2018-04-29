@@ -47,22 +47,6 @@ def fundusDatabase(array, pixelNumber):
     return db
 
 
-def countFundusNeighbours(array):
-    allNeighbours = 0
-    fundusNeighbours = 0
-
-    for x in range(len(array)):
-        for y in range(len(array[0])):
-        #     if x >= 0 and y >= 0 and x < len(array) and y < len(array[0]):
-            if x == y == 4:
-                continue  # skip start coords
-            allNeighbours += 1
-            if isThatFundus([x, y], array):
-                fundusNeighbours += 1
-
-    return fundusNeighbours, allNeighbours
-
-
 def countHuMoments(array):
     array = np.array(array)
     array = cv2.cvtColor(array, cv2.COLOR_BGR2GRAY)
@@ -96,10 +80,11 @@ def countPixelParameters(baseArray, coords):
         [fundusNeighbours, Hu moment, colour variance]
     '''
     baseArray = cut25x25FromArray(baseArray, coords)
+    average = countAverage(baseArray)
     huMoments = countHuMoments(baseArray)
     colourVar = countVariance(baseArray)
 
-    return [fundus, fundusNeighbours, huMoments, colourVar]
+    return [average, huMoments, colourVar]
 
 
 def countAllParameters(baseArray):
