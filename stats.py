@@ -5,6 +5,9 @@ import operator
 import cv2
 import testData
 
+#coefficiants of parameters' significance: [average, hu, variance]
+global coef 
+coef = [1, 2, 1]
 
 def randPixels(array, pixelNumber):
     """Picks pixelNumber items from 2d array. Returns list of coords (pairs)."""
@@ -81,27 +84,26 @@ def countPixelParameters(baseArray, coords):
     '''
     baseArray = cut25x25FromArray(baseArray, coords)
     average = countAverage(np.array(baseArray))
-    #huMoments = countHuMoments(baseArray)
-    huMoments = [0,0,0,0,0,0,0]
+    huMoments = countHuMoments(baseArray)
     colourVar = countVariance(baseArray)
-	average, huMoments, colourVar = scaleParameters(average, huMoments, colourVar)
+    average, huMoments, colourVar = scaleParameters(average, huMoments, colourVar)
     return [average, huMoments, colourVar]
 
 def scaleParameters(average, huMoments, colourVar):
     '''Scales the parameters so that all contain values between roughly 0 and 1'''
     colourVar = colourVar/10000
     average = average/255
-	hu_min_max= [[1.3e-03,2.7e-03],[8.0e-13,9.0e-08],[2.0e-15,2.1e-07],[1.0e-14, 2.0e-11],[-2.4e-28,1.5e-22],[-9.0e-19, 5.8e-16],[-3.5e-23, 4.5e-23]]
+    hu_min_max= [[1.3e-03,2.7e-03],[8.0e-13,9.0e-08],[2.0e-15,2.1e-07],[1.0e-14, 2.0e-11],[-2.4e-28,1.5e-22],[-9.0e-19, 5.8e-16],[-3.5e-23, 4.5e-23]]
     
-	for i in range(len(huMoments)):
-		hu_min = hu_min_max[i][0]
-		hu_max = hu_min_max[i][1]
-		scope = (hu_max - hu_min)
-		part = huMoments[i] - hu_min
-
-		huMoments[i] = part/scope
+    for i in range(len(huMoments)):
+        hu_min = hu_min_max[i][0]
+        hu_max = hu_min_max[i][1]
+        scope = (hu_max - hu_min)
+        part = huMoments[i] - hu_min
+        
+        huMoments[i] = part/scope
 	
-	return (average, huMoments, colourVar)
+    return (average, huMoments, colourVar)
 
 def countAllParameters(baseArray):
     '''
@@ -123,11 +125,11 @@ def euclideanDistance(pixel1, pixel2):
     '''
     distance = 0
     # distance between averages
-    distance += pow((pixel1[0] - pixel2[0]),2)
+    distance += pow((pixel1[0] - pixel2[0]),2) * coef[0]
     # sum of distances of every hu value
-    distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2)
+    distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2) * coef[1]
     # distance between variances
-    distance += pow((pixel1[2] - pixel2[2]), 2)
+    distance += pow((pixel1[2] - pixel2[2]), 2) * coef[2]
 
     return math.sqrt(distance)
 
