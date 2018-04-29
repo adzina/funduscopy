@@ -58,7 +58,7 @@ def countVariance(array):
 
 def countAverage(array):
     '''returns mean value for r g b in form [mean_r mean_g mean_b]'''
-    return array.mean(axis=(0))
+    return array.mean(axis = 0)
 
 def cut25x25FromArray(array, coords):
     """Returns 25x25 square from given array (or less when start point is close to the edge)"""
@@ -77,13 +77,12 @@ def cut25x25FromArray(array, coords):
 
 def countPixelParameters(baseArray, coords):
     '''Returns an array of parameters for a given pixel
-        [fundusNeighbours, Hu moment, colour variance]
+        [average, Hu moment, colour variance]
     '''
     baseArray = cut25x25FromArray(baseArray, coords)
-    average = countAverage(baseArray)
+    average = countAverage(np.array(baseArray))
     huMoments = countHuMoments(baseArray)
     colourVar = countVariance(baseArray)
-
     return [average, huMoments, colourVar]
 
 
@@ -106,8 +105,8 @@ def euclideanDistance(pixel1, pixel2):
     Returns euclidian distance between two pixels.
     '''
     distance = 0
-    # (fundusNeighbours1/allNeighbours1 - fundusNeighbours2/allNeighbours2)^2
-    distance += pow((pixel1[0][0]/pixel1[0][1] - pixel2[0][0]/pixel2[0][1]),2)
+    # distance between averages
+    distance += pow((pixel1[0] - pixel2[0]),2)
     # sum of distances of every hu value
     distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2)
     # distance between variances
@@ -179,7 +178,8 @@ if __name__ == "__main__":
         pom = []
     print(cut25x25FromArray(test, [11, 11]))
     cut = cut25x25FromArray(test, [11, 11])
-    cut = np.array(cut)
+
     print(cut)
-    print(countAverage(cut))
+    av = countAverage(np.array(cut))
+    print((av-av)**2)
 
