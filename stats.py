@@ -81,7 +81,8 @@ def countPixelParameters(baseArray, coords):
     '''
     baseArray = cut25x25FromArray(baseArray, coords)
     average = countAverage(np.array(baseArray))
-    huMoments = countHuMoments(baseArray)
+    #huMoments = countHuMoments(baseArray)
+    huMoments = [0,0,0,0,0,0,0]
     colourVar = countVariance(baseArray)
     return [average, huMoments, colourVar]
 
@@ -181,6 +182,5 @@ if __name__ == "__main__":
     cut = cut25x25FromArray(test, [11, 11])
 
     print(cut)
-    av = countAverage(np.array(cut))
-    print((av-av)**2)
+    print(countAllParameters(np.array(cut)))
 

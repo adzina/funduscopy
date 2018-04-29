@@ -16,12 +16,13 @@ def readTrainingSet():
             while (i < len(tokens)):
                 isFundus = bool(tokens[i][2:])
                 i += 1
-				average=[]
-                average.append(float(tokens[i][6:]))
+                average=[]
+                average.append(float(tokens[i][8:]))
                 i += 1
                 average.append(float(tokens[i]))
                 i += 1
-				average.append(float(tokens[i][:-2]))
+                average.append(float(tokens[i][:-2]))
+                i += 1
                 hu = []
                 hu.append(float(tokens[i][9:].strip()))
                 i += 1
