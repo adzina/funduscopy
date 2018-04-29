@@ -83,7 +83,8 @@ def countPixelParameters(baseArray, coords):
         [average, Hu moment, colour variance]
     '''
     baseArray = cut25x25FromArray(baseArray, coords)
-    average = countAverage(np.array(baseArray))
+	#substract pixel colour by average of neighbours' colour. If value close to 0 than probably pixel is not a fundus
+    average = baseArray[coords[0]][coords[1]] - countAverage(np.array(baseArray))
     huMoments = countHuMoments(baseArray)
     colourVar = countVariance(baseArray)
     average, huMoments, colourVar = scaleParameters(average, huMoments, colourVar)
@@ -200,5 +201,5 @@ if __name__ == "__main__":
     cut = cut25x25FromArray(test, [11, 11])
 
     print(cut)
-    print(countAllParameters(np.array(cut)))
+    print(countAverage(np.array(cut)-np.array([1,2,2])))
 
