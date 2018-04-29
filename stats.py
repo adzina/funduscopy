@@ -130,6 +130,7 @@ def getNeighbours(trainingSet, pixel, k):
     distances = []
     length = len(pixel)-1
     for x in range(len(trainingSet)):
+        '''ommit first elem of trainingSet rows: it says if pixel is a fundus'''
         dist = euclideanDistance(pixel, trainingSet[x][1:])
         distances.append((trainingSet[x], dist))
     distances.sort(key=operator.itemgetter(1))

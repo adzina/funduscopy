@@ -16,10 +16,12 @@ def readTrainingSet():
             while (i < len(tokens)):
                 isFundus = bool(tokens[i][2:])
                 i += 1
-                fundNeighbours = int(tokens[i][2:])
+				average=[]
+                average.append(float(tokens[i][6:]))
                 i += 1
-                allNeighbours = int(tokens[i][1:-1])
+                average.append(float(tokens[i]))
                 i += 1
+				average.append(float(tokens[i][:-2]))
                 hu = []
                 hu.append(float(tokens[i][9:].strip()))
                 i += 1
@@ -37,7 +39,7 @@ def readTrainingSet():
                 i += 1
                 variance = float(tokens[i][:-1].strip())
                 i += 1
-                trainingSet.append((isFundus, (fundNeighbours,allNeighbours),hu, variance))
+                trainingSet.append((isFundus, average, hu, variance))
                 print(trainingSet)
 if __name__ == "__main__":
     files = listdir("test_img")
