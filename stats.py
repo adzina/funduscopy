@@ -4,6 +4,7 @@ import math
 import operator
 import cv2
 import testData
+import matplotlib as plt
 
 #coefficiants of parameters' significance: [average, hu, variance]
 global coef 
@@ -158,6 +159,69 @@ def getNeighbours(trainingSet, pixel, k):
     for x in range(k):
         neighbours.append(distances[x][0])
     return neighbours
+
+
+def contoursApprox(image):
+    """
+    Takes image and returns filtered contours.
+    Return type: 2D np array with values 0 (not fundus) or 255 (fundus).
+    """
+
+    def setImage(image):
+        return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+    def setBlur(image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # conversion, getting basic pic
+
+        image = cv2.GaussianBlur(image, (3, 3),  # gaussian kernel size
+                                 0)  # sigmaX - gaussian kernel standard derivation in x direction
+
+        image = cv2.medianBlur(image, 3)  # aperture linear size
+
+        return image
+
+    def getThresh(image):
+        t, _ = cv2.threshold(image, 0,  # threshold value
+                             255,  # max value to use with thresh_bin
+                             cv2.THRESH_BINARY + cv2.THRESH_OTSU)  # thresh type
+        return t
+
+    def applyFilters(image, operations):
+        # canny - edge detection
+        if "canny" in operations.keys():
+            image = cv2.Canny(image, 0.2 * operations["canny"],  # first threshold
+                              operations["canny"])  # 2nd thresh for hysteresis
+
+        # dilatation - increases thickness
+        if "dilatation" in operations.keys():
+            image = cv2.dilate(image, np.ones((3, 3), np.uint8),  # dilatation structuring element
+                               iterations=operations["dilatation"])  # repeat number
+
+        # erosion - opposite to dilatation
+        if "erosion" in operations.keys():
+            image = cv2.erode(image, np.ones((3, 3), np.uint8),  # erosion structuring element
+                              iterations=operations["erosion"])  # repeat number
+
+        return image
+
+    def getContours(image):
+        _, c, _ = cv2.findContours(image, cv2.RETR_EXTERNAL,  # retrieval mode, only extreme outer contours
+                                   cv2.CHAIN_APPROX_SIMPLE)  # approx method
+        return c
+
+    image = setImage(image)
+
+    # drawing first contour
+    blurred = setBlur(image)
+
+    # thresh - changing value if bigger to one, if lower to another
+    thresh = getThresh(blurred)
+
+    filtered = applyFilters(blurred, {"canny": thresh, "dilatation": 2})
+
+    # plt.imshow(filtered)
+
+    return filtered
 
 
 def predictFundus(coords, paramArray):
