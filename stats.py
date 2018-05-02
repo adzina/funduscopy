@@ -62,7 +62,17 @@ def countVariance(array):
 
 def countAverage(array):
     '''returns mean value for r g b in form [mean_r mean_g mean_b]'''
-    return array.mean(axis = 0)
+    r = []
+    g = []
+    b = []
+    for i in array:
+        r.append(i[0])
+        g.append(i[1])
+        b.append(i[2])
+    mean_r = np.array(r).mean()		
+    mean_g = np.array(g).mean()	
+    mean_b = np.array(b).mean()
+    return np.array([mean_r, mean_g, mean_b])
 
 def cut25x25FromArray(array, coords):
     """Returns 25x25 square from given array (or less when start point is close to the edge)"""
@@ -83,11 +93,12 @@ def countPixelParameters(baseArray, coords):
     '''Returns an array of parameters for a given pixel
         [average, Hu moment, colour variance]
     '''
-    baseArray = cut25x25FromArray(baseArray, coords)
+    baseArrayCut = cut25x25FromArray(baseArray, coords)
 	#substract pixel colour by average of neighbours' colour. If value close to 0 than probably pixel is not a fundus
-    average = baseArray[coords[0]][coords[1]] - countAverage(np.array(baseArray))
-    huMoments = countHuMoments(baseArray)
-    colourVar = countVariance(baseArray)
+    
+    average = baseArray[coords[0]][coords[1]] - countAverage(np.array(baseArrayCut))
+    huMoments = countHuMoments(baseArrayCut)
+    colourVar = countVariance(baseArrayCut)
     average, huMoments, colourVar = scaleParameters(average, huMoments, colourVar)
     return [average, huMoments, colourVar]
 

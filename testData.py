@@ -48,11 +48,11 @@ if __name__ == "__main__":
     print(files)
 
     for file in files:
-        resultImg = cv2.imread("/home/odys1528/PycharmProjects/funduscopy/result_img/" + file + ".ah.ppm")  # b&w
-        baseImg = cv2.imread("/home/odys1528/PycharmProjects/funduscopy/test_img/" + file + ".ppm")  # color
+        resultImg = cv2.imread("E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/result_img/" + file + ".ah.ppm")  # b&w
+        baseImg = cv2.imread("E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/test_img/" + file + ".ppm")  # color
         print("file: " + file)
 
-        file = open("/home/odys1528/PycharmProjects/funduscopy/test_results/" + file + ".txt", "w")
+        file = open("E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/test_results/" + file + ".txt", "w")
 
         db = stats.fundusDatabase(resultImg, 10000)
         i=0
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         sep=", "
         for c in testPixels:
             if c == testPixels[-1]: sep=""
-            file.write(str(stats.countPixelParameters(baseImg, resultImg, c)) + sep)
+            file.write(str(stats.countPixelParameters(baseImg, c)) + sep)
         file.write("]")
         file.close()
 
