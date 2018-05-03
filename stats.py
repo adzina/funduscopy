@@ -97,9 +97,11 @@ def countPixelParameters(baseArray, coords):
 	#substract pixel colour by average of neighbours' colour. If value close to 0 than probably pixel is not a fundus
     
     average = baseArray[coords[0]][coords[1]] - countAverage(np.array(baseArrayCut))
+    	
     huMoments = countHuMoments(baseArrayCut)
     colourVar = countVariance(baseArrayCut)
     average, huMoments, colourVar = scaleParameters(average, huMoments, colourVar)
+    		
     return [average, huMoments, colourVar]
 
 def scaleParameters(average, huMoments, colourVar):
@@ -129,6 +131,9 @@ def countAllParameters(baseArray):
             c=[x,y]
             row.append(countPixelParameters(baseArray, c))
         paramArray.append(row)
+        print(x,y)
+    print("counting finished")
+    exit(1)
     return paramArray
 
 
@@ -237,6 +242,8 @@ def contoursApprox(image):
 
 def predictFundus(coords, paramArray):
     trainingSet = testData.readTrainingSet()
+    print("read!")
+    return 0
     fundus = 0
     nonFundus = 0
     k=4

@@ -6,6 +6,7 @@ from PIL import Image
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog
 from pyqtgraph.Qt import QtGui
+import cv2
 
 import prepare
 import stats
@@ -85,8 +86,7 @@ class App(QWidget):
         if FILENAME == '': return
         print(FILENAME)
 
-        self.img = Image.open(FILENAME)
-
+        self.img = cv2.imread(FILENAME)
         to_disp = np.array(self.img)
         self.imageView.setImage(to_disp)
 
@@ -96,9 +96,11 @@ class App(QWidget):
     @pyqtSlot()
     def startClickAction(self):
         global result_img
-        binary = stats.generateBinaryImage(self.img)
-        self.startButton.setEnabled(False)
-        self.resultView.setImage(binary)
+        #binary = stats.generateBinaryImage(self.img)
+        #self.startButton.setEnabled(False)
+        #self.resultView.setImage(binary)
+        contours = stats.contoursApprox(self.img)
+        self.resultView.setImage(contours)		
 
     @pyqtSlot()
     def applyClickAction(self):
