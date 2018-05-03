@@ -7,8 +7,10 @@ import testData
 import matplotlib as plt
 
 #coefficiants of parameters' significance: [average, hu, variance]
-global coef 
-coef = [1, 2, 1]
+global COEF
+global DILATATION
+COEF = [1, 2, 1]
+DILATATION = 10
 
 def randPixels(array, pixelNumber):
     """Picks pixelNumber items from 2d array. Returns list of coords (pairs)."""
@@ -94,7 +96,7 @@ def countPixelParameters(baseArray, coords):
         [average, Hu moment, colour variance]
     '''
     baseArrayCut = cut25x25FromArray(baseArray, coords)
-	#substract pixel colour by average of neighbours' colour. If value close to 0 than probably pixel is not a fundus
+	#substract pixel colour from average of neighbours' colour. If value close to 0 than probably pixel is not a fundus
     
     average = baseArray[coords[0]][coords[1]] - countAverage(np.array(baseArrayCut))
     	
@@ -132,6 +134,7 @@ def countAllParameters(baseArray):
             row.append(countPixelParameters(baseArray, c))
         paramArray.append(row)
         print(x,y)
+        
     print("counting finished")
     exit(1)
     return paramArray
@@ -143,11 +146,11 @@ def euclideanDistance(pixel1, pixel2):
     '''
     distance = 0
     # distance between averages
-    distance += pow((pixel1[0] - pixel2[0]),2) * coef[0]
+    distance += pow((pixel1[0] - pixel2[0]),2) * COEF[0]
     # sum of distances of every hu value
-    distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2) * coef[1]
+    distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2) * COEF[1]
     # distance between variances
-    distance += pow((pixel1[2] - pixel2[2]), 2) * coef[2]
+    distance += pow((pixel1[2] - pixel2[2]), 2) * COEF[2]
 
     return math.sqrt(distance)
 
@@ -224,6 +227,7 @@ def contoursApprox(image):
         _, c, _ = cv2.findContours(image, cv2.RETR_EXTERNAL,  # retrieval mode, only extreme outer contours
                                    cv2.CHAIN_APPROX_SIMPLE)  # approx method
         return c
+    
 
     image = setImage(image)
 
@@ -233,13 +237,34 @@ def contoursApprox(image):
     # thresh - changing value if bigger to one, if lower to another
     thresh = getThresh(blurred)
 
-    filtered = applyFilters(blurred, {"canny": thresh, "dilatation": 2})
+    filtered = applyFilters(blurred, {"canny": thresh, "dilatation": DILATATION})
 
     # plt.imshow(filtered)
 
     return filtered
 
-
+def countStats():
+        img_col = cv2.imread('test_img/im0001.ppm')
+        img_bw = cv2.imread('result_img/im0001.ah.ppm')
+        contours = contoursApprox(img_col)
+        false_positive = 0
+        false_negative = 0
+        for i in range(len(contours)):
+            for j in range(len(contours[0])):
+                if( np.array_equal(contours[i][j],0) and  np.array_equal(img_bw[i][j],[255,255,255])):
+                    false_positive+=1
+                if( np.array_equal(contours[i][j],255) and  np.array_equal(img_bw[i][j],[0,0,0])):
+                    false_negative+=1
+        print(false_positive)
+        print(false_negative)
+        print(100*false_positive/(len(contours)*len(contours[0])))
+        print(100*false_negative/(len(contours)*len(contours[0])))
+        file = open("dilatation_stats.txt","a")
+        str_to_write = "DILATATION: "+str(DILATATION)+ \
+        "\n"+"false_positive: "+str(round(100*false_positive/(len(contours)*len(contours[0])),2))+"%\n"+ \
+        "false negative: "+str(round(100*false_negative/(len(contours)*len(contours[0])),2))+"%\n\n"
+        file.write(str_to_write)
+        file.close()
 def predictFundus(coords, paramArray):
     trainingSet = testData.readTrainingSet()
     print("read!")
@@ -272,16 +297,17 @@ def generateBinaryImage(image):
 
 if __name__ == "__main__":
     # main function for tests
-    test = []
-    pom = []
-    for x in range(12):
-        for y in range(3):
-            pom.append(x)
-        test.append(pom)
-        pom = []
-    print(cut25x25FromArray(test, [11, 11]))
-    cut = cut25x25FromArray(test, [11, 11])
+    # test = []
+    # pom = []
+    # for x in range(12):
+        # for y in range(3):
+            # pom.append(x)
+        # test.append(pom)
+        # pom = []
+    # print(cut25x25FromArray(test, [11, 11]))
+    # cut = cut25x25FromArray(test, [11, 11])
 
-    print(cut)
-    print(countAverage(np.array(cut)-np.array([1,2,2])))
+    # print(cut)
+    # print(countAverage(np.array(cut)-np.array([1,2,2])))
+	countStats()
 

@@ -96,11 +96,11 @@ class App(QWidget):
     @pyqtSlot()
     def startClickAction(self):
         global result_img
-        #binary = stats.generateBinaryImage(self.img)
-        #self.startButton.setEnabled(False)
-        #self.resultView.setImage(binary)
-        contours = stats.contoursApprox(self.img)
-        self.resultView.setImage(contours)		
+        binary = stats.generateBinaryImage(self.img)
+        self.startButton.setEnabled(False)
+        self.resultView.setImage(binary)
+        #contours = stats.contoursApprox(self.img)
+        #self.resultView.setImage(contours)		
 
     @pyqtSlot()
     def applyClickAction(self):

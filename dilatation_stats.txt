@@ -1,0 +1,41 @@
+
+DILATATION: 1
+false_positive: 6.75%
+false negative: 6.53%
+
+DILATATION: 2
+false_positive: 6.15%
+false negative: 10.2%
+
+DILATATION: 3
+false_positive: 5.77%
+false negative: 13.47%
+
+DILATATION: 4
+false_positive: 5.46%
+false negative: 16.56%
+
+DILATATION: 5
+false_positive: 5.2%
+false negative: 19.51%
+
+DILATATION: 6
+false_positive: 4.98%
+false negative: 22.33%
+
+DILATATION: 7
+false_positive: 4.79%
+false negative: 25.04%
+
+DILATATION: 8
+false_positive: 4.63%
+false negative: 27.62%
+
+DILATATION: 9
+false_positive: 4.47%
+false negative: 30.07%
+
+DILATATION: 10
+false_positive: 4.33%
+false negative: 32.3%
+
