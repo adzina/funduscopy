@@ -133,10 +133,6 @@ def countAllParameters(baseArray):
             c=[x,y]
             row.append(countPixelParameters(baseArray, c))
         paramArray.append(row)
-        print(x,y)
-        
-    print("counting finished")
-    exit(1)
     return paramArray
 
 
@@ -146,12 +142,16 @@ def euclideanDistance(pixel1, pixel2):
     '''
     distance = 0
     # distance between averages
-    distance += pow((pixel1[0] - pixel2[0]),2) * COEF[0]
+    distance += (pow((pixel1[0][0] - pixel2[0][0]),2)+ pow((pixel1[0][1] - pixel2[0][1]),2) + pow((pixel1[0][2] - pixel2[0][2]),2))* COEF[0]
     # sum of distances of every hu value
     distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2) * COEF[1]
     # distance between variances
     distance += pow((pixel1[2] - pixel2[2]), 2) * COEF[2]
-
+    # print(pow((pixel1[0] - pixel2[0]),2) * COEF[0])
+    # print(pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2) * COEF[1])
+    # print(pow((pixel1[2] - pixel2[2]), 2) * COEF[2])
+    # print(distance)
+    # exit(1)
     return math.sqrt(distance)
 
 def euclidianDistanceHu(hu1, hu2):
@@ -265,14 +265,11 @@ def countStats():
         "false negative: "+str(round(100*false_negative/(len(contours)*len(contours[0])),2))+"%\n\n"
         file.write(str_to_write)
         file.close()
-def predictFundus(coords, paramArray):
-    trainingSet = testData.readTrainingSet()
-    print("read!")
-    return 0
+def predictFundus(coords, paramArray, trainingSet):
     fundus = 0
     nonFundus = 0
     k=4
-    neighbours = getNeighbours(trainingSet, paramArray[coords[0],coords[1]],k)
+    neighbours = getNeighbours(trainingSet, paramArray[coords[0]][coords[1]],k)
     for i in neighbours:
         if i[0]==True: #isFundus
             fundus+=1
@@ -283,12 +280,13 @@ def predictFundus(coords, paramArray):
 
 def generateBinaryImage(image):
     paramArray = countAllParameters(image)
+    trainingSet = testData.readTrainingSet()[:1000]
     image=np.array(image)
     binary=np.zeros(image.shape)
     for x in range(len(image)):
         for y in range(len(image[0])):
             c=[x,y]
-            if predictFundus(c,paramArray):
+            if predictFundus(c,paramArray, trainingSet):
                 binary[x][y]=[255,255,255]
             else:
                 binary[x][y]=[0,0,0]

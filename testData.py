@@ -6,7 +6,6 @@ def readTrainingSet():
     files = listdir("test_results")
     files = [x[:-4] for x in files]
     trainingSet = []
-    print(files)	
     for file in files:
         with open("E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/test_results/" + file + ".txt",
                   "r") as file:
