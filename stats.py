@@ -282,14 +282,14 @@ def generateBinaryImage(image):
     paramArray = countAllParameters(image)
     trainingSet = testData.readTrainingSet()[:1000]
     image=np.array(image)
-    binary=np.zeros(image.shape)
+    binary = []
     for x in range(len(image)):
         for y in range(len(image[0])):
             c=[x,y]
             if predictFundus(c,paramArray, trainingSet):
-                binary[x][y]=[255,255,255]
+                binary[x][y]=255
             else:
-                binary[x][y]=[0,0,0]
+                binary[x][y]=0
 
     return binary
 

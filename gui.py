@@ -86,9 +86,9 @@ class App(QWidget):
         if FILENAME == '': return
         print(FILENAME)
 
-        self.img = cv2.imread(FILENAME)
-        to_disp = np.array(self.img)
-        self.imageView.setImage(to_disp)
+        self.img = Image.open(FILENAME)
+        self.to_disp = np.array(self.img)
+        self.imageView.setImage(self.to_disp)
 
         self.startButton.setEnabled(True)
         self.applyButton.setEnabled(True)
@@ -97,14 +97,20 @@ class App(QWidget):
     def startClickAction(self):
         global result_img
         
-        binary = stats.generateBinaryImage(self.img[150:250][:100])
-        print(binary[:50][:50])
+        #binary = stats.generateBinaryImage(self.to_disp[:100][:100])
+        binary = stats.contoursApprox(self.to_disp)
+        
         self.startButton.setEnabled(False)
-        self.resultView.setImage(binary)
-        self.startButton.setEnabled(True)
-        #contours = stats.contoursApprox(self.img)
-        #self.resultView.setImage(contours)		
-
+		
+        self.showImage(binary, 0, 0)
+		
+    def showImage(self, mask, offset_x, offset_y):
+	    for i in range(len(mask)):
+		    for j in range(len(mask[0])):
+			    if(mask[i][j]==255):
+				    self.to_disp[i+offset_x][j+offset_y] = np.array(list([255,255,255]))
+	    self.resultView.setImage(self.to_disp)
+		
     @pyqtSlot()
     def applyClickAction(self):
         self.applyButton.setEnabled(False)
