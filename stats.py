@@ -9,7 +9,7 @@ import matplotlib as plt
 #coefficiants of parameters' significance: [average, hu, variance]
 global COEF
 global DILATATION
-COEF = [1, 2, 1]
+COEF = [100, 2, 1]
 DILATATION = 10
 
 def randPixels(array, pixelNumber):
@@ -281,15 +281,16 @@ def predictFundus(coords, paramArray, trainingSet):
 def generateBinaryImage(image):
     paramArray = countAllParameters(image)
     trainingSet = testData.readTrainingSet()[:1000]
-    image=np.array(image)
     binary = []
     for x in range(len(image)):
         for y in range(len(image[0])):
             c=[x,y]
+            row = []
             if predictFundus(c,paramArray, trainingSet):
-                binary[x][y]=255
+                row.append(255)
             else:
-                binary[x][y]=0
+                row.append(0)
+        binary.append(row)
 
     return binary
 

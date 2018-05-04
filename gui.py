@@ -97,12 +97,21 @@ class App(QWidget):
     def startClickAction(self):
         global result_img
         
-        #binary = stats.generateBinaryImage(self.to_disp[:100][:100])
-        binary = stats.contoursApprox(self.to_disp)
+        off_x = 200
+        off_y = 200
+        size_x = 100
+        size_y = size_x
+        a = self.to_disp[off_y:off_y+size_y]
+        cut=[]
+        for i in a:
+            cut.append(i[off_x:off_x+size_x])
+        cut = np.array(cut).flatten().reshape((size_x,size_y,3))
+        binary = stats.generateBinaryImage(cut)
+        #binary = stats.contoursApprox(self.to_disp)
         
         self.startButton.setEnabled(False)
 		
-        self.showImage(binary, 0, 0)
+        self.showImage(binary, off_x, off_y)
 		
     def showImage(self, mask, offset_x, offset_y):
 	    for i in range(len(mask)):
