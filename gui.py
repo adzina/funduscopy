@@ -123,8 +123,8 @@ class App(QWidget):
 
         if (norm):
             self.img = prepare.norm(self.img)
-        to_disp = np.array(self.img)
-        self.imageView.setImage(to_disp)
+        self.to_disp = np.array(self.img)
+        self.imageView.setImage(self.to_disp)
         self.applyButton.setEnabled(True)
 
 
