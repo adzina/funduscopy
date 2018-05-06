@@ -14,7 +14,10 @@ def readTrainingSet():
             tokens = data.split(",")
             i = 0
             while (i < len(tokens)):
-                isFundus = bool(tokens[i].strip())
+                if(tokens[i].strip()[1:]=="False"):
+                    isFundus = False
+                else:
+                    isFundus = True
                 i += 1
                 average=[]
                 average.append(float(tokens[i][7:]))
