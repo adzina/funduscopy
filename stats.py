@@ -268,7 +268,7 @@ def countStats():
 def predictFundus(coords, paramArray, trainingSet):
     fundus = 0
     nonFundus = 0
-    k=4
+    k=3
     neighbours = getNeighbours(trainingSet, paramArray[coords[0]][coords[1]],k)
     for i in neighbours:
         if i[0]==True: #isFundus
@@ -283,9 +283,9 @@ def generateBinaryImage(image):
     trainingSet = testData.readTrainingSet()[:1000]
     binary = []
     for x in range(len(image)):
+        row = []
         for y in range(len(image[0])):
             c=[x,y]
-            row = []
             if predictFundus(c,paramArray, trainingSet):
                 row.append(255)
             else:
