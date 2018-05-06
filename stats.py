@@ -5,6 +5,8 @@ import operator
 import cv2
 import testData
 import matplotlib as plt
+from sklearn.metrics import mean_squared_error
+from PIL import Image
 
 #coefficiants of parameters' significance: [average, hu, variance]
 global COEF
@@ -294,6 +296,39 @@ def generateBinaryImage(image):
 
     return binary
 
+
+def calcDiffByArray(calculatedResult, pathFile):
+    """
+    calculatedResult - black'n'white matrix, computation result
+    pathFile - full path of base file, used to pick right result from result_img
+    """
+    pathFile = pathFile.replace(".ppm", ".ah.ppm")
+    pathFile = pathFile.replace("test_img", "result_img")
+    im = Image.open(pathFile)
+    # im.show()
+    INPUT = list(im.getdata())
+    RESULT = list(calculatedResult)  # TODO is type ok?
+
+    return mean_squared_error(INPUT, RESULT)
+
+
+def calcDiffByName(pathFile):
+    """
+    pathFile - full path of base file, used to pick right result from result_img
+    """
+    pathFile = pathFile.replace(".ppm", ".ah.ppm")
+    pathFile = pathFile.replace("test_img", "result_img")
+    im = Image.open(pathFile)
+    # im.show()
+    INPUT = list(im.getdata())
+
+    resultPath = "path to" + pathFile[pathFile.rfind("/")+1:pathFile.rfind(".")] + "extension"  # TODO paste resultPath
+    im = Image.open(resultPath)
+    RESULT = list(im.getdata())
+
+    return mean_squared_error(INPUT, RESULT)
+
+
 if __name__ == "__main__":
     # main function for tests
     # test = []
@@ -308,5 +343,6 @@ if __name__ == "__main__":
 
     # print(cut)
     # print(countAverage(np.array(cut)-np.array([1,2,2])))
-	countStats()
+    # countStats()
+    calcDiffByName("/home/odys1528/PycharmProjects/funduscopy/test_img/im0001.ppm")
 
