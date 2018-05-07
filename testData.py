@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
        db = stats.fundusDatabase(resultImg, 10000)
        i=0
-       while len(db['fundus'])<500:
+       while len(db['fundus'])<300:
            i+=100
            db = stats.fundusDatabase(resultImg, 10000+i)
            print('again ' + str(len(db['fundus'])))
@@ -68,11 +68,11 @@ if __name__ == "__main__":
        print("db done")
 
        file.write("[")
-       testPixels = db['fundus'][:500]+db['else'][:500]
+       testPixels = db['fundus'][:300]+db['else'][:700]
        sep=", "
        for i in range(len(testPixels)):
            if testPixels[i] == testPixels[-1]: sep=""
-           if(i<500):
+           if(i<300):
                file.write("[True,"+str(stats.countPixelParameters(baseImg, testPixels[i]))[1:] + sep)
            else:
                file.write("[False," +str(stats.countPixelParameters(baseImg, testPixels[i]))[1:] + sep)
