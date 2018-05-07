@@ -11,7 +11,7 @@ from PIL import Image
 #coefficiants of parameters' significance: [average, hu, variance]
 global COEF
 global DILATATION
-COEF = [100, 2, 1]
+COEF = [2, 100000, 1]
 DILATATION = 10
 
 def randPixels(array, pixelNumber):
@@ -149,11 +149,6 @@ def euclideanDistance(pixel1, pixel2):
     distance += pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2) * COEF[1]
     # distance between variances
     distance += pow((pixel1[2] - pixel2[2]), 2) * COEF[2]
-    # print(pow((pixel1[0] - pixel2[0]),2) * COEF[0])
-    # print(pow(euclidianDistanceHu(pixel1[1],pixel2[1]),2) * COEF[1])
-    # print(pow((pixel1[2] - pixel2[2]), 2) * COEF[2])
-    # print(distance)
-    # exit(1)
     return math.sqrt(distance)
 
 def euclidianDistanceHu(hu1, hu2):
@@ -245,6 +240,21 @@ def contoursApprox(image):
 
     return filtered
 
+def calcDiffByArray(calculatedResult, pathFile):
+    """
+    calculatedResult - black'n'white matrix, computation result
+    pathFile - full path of base file, used to pick right result from result_img
+    """
+    pathFile = pathFile.replace(".ppm", ".ah.ppm")
+    pathFile = pathFile.replace("test_img", "result_img")
+    im = Image.open(pathFile)
+    # im.show()
+    INPUT = list(im.getdata())
+    RESULT = list(calculatedResult)  # TODO is type ok?
+
+    return mean_squared_error(INPUT, RESULT)
+
+
 def countStats():
         img_col = cv2.imread('test_img/im0001.ppm')
         img_bw = cv2.imread('result_img/im0001.ah.ppm')
@@ -257,10 +267,6 @@ def countStats():
                     false_positive+=1
                 if( np.array_equal(contours[i][j],255) and  np.array_equal(img_bw[i][j],[0,0,0])):
                     false_negative+=1
-        print(false_positive)
-        print(false_negative)
-        print(100*false_positive/(len(contours)*len(contours[0])))
-        print(100*false_negative/(len(contours)*len(contours[0])))
         file = open("dilatation_stats.txt","a")
         str_to_write = "DILATATION: "+str(DILATATION)+ \
         "\n"+"false_positive: "+str(round(100*false_positive/(len(contours)*len(contours[0])),2))+"%\n"+ \
@@ -283,66 +289,80 @@ def predictFundus(coords, paramArray, trainingSet):
 def generateBinaryImage(image):
     paramArray = countAllParameters(image)
     trainingSet = testData.readTrainingSet()[:1000]
+    print("read TrainingSet")
     binary = []
     for x in range(len(image)):
         row = []
         for y in range(len(image[0])):
             c=[x,y]
-            if predictFundus(c,paramArray, trainingSet):
-                row.append(255)
-            else:
+            if (not predictFundus(c,paramArray, trainingSet)) or x==0 or y==0 or x==len(image)-1 or y==len(image[0])-1 :
                 row.append(0)
+            else:
+                row.append(255)
         binary.append(row)
+        print("row "+str(x)+" calculated")
 
     return binary
 
+def countKNNStats():
+    files = ["0002","0003","0004","0005","0044"]
+    coefs = [[1, 10, 1],[1, 100, 1],[1, 100, 2],[1, 1000, 1],[1, 10000, 1],[1,100000, 1],[2,100000, 1]]
+    for x in files:
+        img_col = np.array(cv2.imread('test_img/im'+x+'.ppm'))
+        img_bw = np.array(cv2.imread('result_img/im'+x+'.ah.ppm'))
+        off_x = 200
+        off_y = off_x
+        size_x = 100
+        size_y = size_x
+        a = img_col[off_y:off_y+size_y]
+        cut=[]
+        for i in a:
+            cut.append(i[off_x:off_x+size_x])
+        cut = np.array(cut).flatten().reshape((size_x,size_y,3))
+        
+        for coef in coefs:
+            COEF = coef
+           
+            contours = generateBinaryImage(cut)
+            false_positive = 0
+            false_negative = 0
+            true_positive = 0
+            true_negative = 0
+            for i in range(len(contours)):
+                for j in range(len(contours[0])):
+                    if( np.array_equal(contours[i][j],0) and  np.array_equal(img_bw[i][j],[255,255,255])):
+                        false_negative+=1
+                    if( np.array_equal(contours[i][j],255) and  np.array_equal(img_bw[i][j],[0,0,0])):
+                        false_positive+=1
+                    if( np.array_equal(contours[i][j],255) and  np.array_equal(img_bw[i][j],[255,255,255])):
+                        true_positive+=1
+                    if( np.array_equal(contours[i][j],0) and  np.array_equal(img_bw[i][j],[0,0,0])):
+                        true_negative+=1
+            file = 'knn_stats/knn_stats_'+x+'.txt'
+            file = open(file,"a")
+            print(true_positive)
+            print(true_negative)
+            print(false_positive)
+            print(false_negative)
+            print(true_positive/(true_positive+true_negative))
+            print(true_positive/(true_positive+false_positive))
+            false_positive = round(false_positive,5)
+            false_negative = round(false_negative,5)
+            recall = round(true_positive/(true_positive+true_negative),5)
+            precision = round(true_positive/(true_positive+false_positive),5)
 
-def calcDiffByArray(calculatedResult, pathFile):
-    """
-    calculatedResult - black'n'white matrix, computation result
-    pathFile - full path of base file, used to pick right result from result_img
-    """
-    pathFile = pathFile.replace(".ppm", ".ah.ppm")
-    pathFile = pathFile.replace("test_img", "result_img")
-    im = Image.open(pathFile)
-    # im.show()
-    INPUT = list(im.getdata())
-    RESULT = list(calculatedResult)  # TODO is type ok?
 
-    return mean_squared_error(INPUT, RESULT)
-
-
-def calcDiffByName(pathFile):
-    """
-    pathFile - full path of base file, used to pick right result from result_img
-    """
-    pathFile = pathFile.replace(".ppm", ".ah.ppm")
-    pathFile = pathFile.replace("test_img", "result_img")
-    im = Image.open(pathFile)
-    # im.show()
-    INPUT = list(im.getdata())
-
-    resultPath = "path to" + pathFile[pathFile.rfind("/")+1:pathFile.rfind(".")] + "extension"  # TODO paste resultPath
-    im = Image.open(resultPath)
-    RESULT = list(im.getdata())
-
-    return mean_squared_error(INPUT, RESULT)
-
+            mse = calcDiffByArray(contours, "E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/test_img/im"+x+'.ppm')
+            str_to_write = "COEF: "+str(COEF)+ \
+            "\n"+"false positive: "+str(false_positive)+"\n"+ \
+            "false negative: "+str(false_negative)+"\n"+ \
+			"recall: "+str(recall)+"\n"+ \
+            "precision: "+str(precision)+"\n"+\
+            "mse:"+str(mse)+"\n\n"
+            file.write(str_to_write)
+            file.close()
 
 if __name__ == "__main__":
     # main function for tests
-    # test = []
-    # pom = []
-    # for x in range(12):
-        # for y in range(3):
-            # pom.append(x)
-        # test.append(pom)
-        # pom = []
-    # print(cut25x25FromArray(test, [11, 11]))
-    # cut = cut25x25FromArray(test, [11, 11])
-
-    # print(cut)
-    # print(countAverage(np.array(cut)-np.array([1,2,2])))
-    # countStats()
-    calcDiffByName("/home/odys1528/PycharmProjects/funduscopy/test_img/im0001.ppm")
+	countKNNStats()
 
