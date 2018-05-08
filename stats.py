@@ -247,9 +247,18 @@ def calcDiffByArray(calculatedResult, pathFile):
     """
     pathFile = pathFile.replace(".ppm", ".ah.ppm")
     pathFile = pathFile.replace("test_img", "result_img")
-    im = Image.open(pathFile)
+    im = cv2.imread(pathFile)
     # im.show()
-    INPUT = list(im.getdata())
+    off_x = 200
+    off_y = off_x
+    size_x = 100
+    size_y = size_x
+    a = np.array(im)[off_y:off_y+size_y]
+    cut=[]
+    for i in a:
+        cut.append(i[off_x:off_x+size_x])
+    cut = np.array(cut).flatten().reshape((size_x,size_y,3))
+    INPUT = list(cut)
     RESULT = list(calculatedResult)  # TODO is type ok?
 
     return mean_squared_error(INPUT, RESULT)
@@ -310,6 +319,7 @@ def countKNNStats():
     for x in files:
         img_col = np.array(cv2.imread('test_img/im'+x+'.ppm'))
         img_bw = np.array(cv2.imread('result_img/im'+x+'.ah.ppm'))
+        
         off_x = 200
         off_y = off_x
         size_x = 100
@@ -330,16 +340,17 @@ def countKNNStats():
             true_negative = 0
             for i in range(len(contours)):
                 for j in range(len(contours[0])):
-                    if( np.array_equal(contours[i][j],0) and  np.array_equal(img_bw[i][j],[255,255,255])):
+                    if( contours[i][j] == 0 and  np.array_equal(img_bw[i+off_x][j+off_y],[255,255,255])):
                         false_negative+=1
-                    if( np.array_equal(contours[i][j],255) and  np.array_equal(img_bw[i][j],[0,0,0])):
+                    if( contours[i][j] ==255 and  np.array_equal(img_bw[i+off_x][j+off_y],[0,0,0])):
                         false_positive+=1
-                    if( np.array_equal(contours[i][j],255) and  np.array_equal(img_bw[i][j],[255,255,255])):
+                    if( contours[i][j] == 255 and  np.array_equal(img_bw[i+off_x][j+off_y],[255,255,255])):
                         true_positive+=1
-                    if( np.array_equal(contours[i][j],0) and  np.array_equal(img_bw[i][j],[0,0,0])):
+                    if( contours[i][j] == 0 and  np.array_equal(img_bw[i+off_x][j+off_y],[0,0,0])):
                         true_negative+=1
             file = 'knn_stats/knn_stats_'+x+'.txt'
             file = open(file,"a")
+            
             print(true_positive)
             print(true_negative)
             print(false_positive)
@@ -351,7 +362,6 @@ def countKNNStats():
             recall = round(true_positive/(true_positive+true_negative),5)
             precision = round(true_positive/(true_positive+false_positive),5)
 
-
             mse = calcDiffByArray(contours, "E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/test_img/im"+x+'.ppm')
             str_to_write = "COEF: "+str(COEF)+ \
             "\n"+"false positive: "+str(false_positive)+"\n"+ \
@@ -361,6 +371,7 @@ def countKNNStats():
             "mse:"+str(mse)+"\n\n"
             file.write(str_to_write)
             file.close()
+            exit(1)
 
 if __name__ == "__main__":
     # main function for tests
