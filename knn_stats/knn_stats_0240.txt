@@ -1,0 +1,49 @@
+COEF: [1, 10, 1]
+false positive: 2972
+false negative: 857
+recall: 0.11343
+precision: 0.19063
+mse:24898.0725
+
+COEF: [1, 100, 1]
+false positive: 3396
+false negative: 865
+recall: 0.12058
+precision: 0.16928
+mse:27707.1525
+
+COEF: [1, 100, 2]
+false positive: 3337
+false negative: 883
+recall: 0.11661
+precision: 0.16804
+mse:27440.55
+
+COEF: [1, 1000, 1]
+false positive: 3855
+false negative: 766
+recall: 0.14705
+precision: 0.17025
+mse:30048.0525
+
+COEF: [1, 10000, 1]
+false positive: 4283
+false negative: 706
+recall: 0.16983
+precision: 0.16576
+mse:32440.9725
+
+COEF: [1, 100000, 1]
+false positive: 4405
+false negative: 694
+recall: 0.17609
+precision: 0.16382
+mse:33156.2475
+
+COEF: [2, 100000, 1]
+false positive: 4401
+false negative: 695
+recall: 0.17577
+precision: 0.16378
+mse:33136.74
+

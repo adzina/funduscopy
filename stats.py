@@ -9,10 +9,10 @@ from sklearn.metrics import mean_squared_error
 from PIL import Image
 
 #coefficiants of parameters' significance: [average, hu, variance]
-global COEF
-global DILATATION
-COEF = [2, 100000, 1]
-DILATATION = 10
+# global COEF
+# global DILATATION
+COEF = [1, 100000, 2]
+DILATATION = 1
 
 def randPixels(array, pixelNumber):
     """Picks pixelNumber items from 2d array. Returns list of coords (pairs)."""
@@ -258,10 +258,22 @@ def calcDiffByArray(calculatedResult, pathFile):
     for i in a:
         cut.append(i[off_x:off_x+size_x])
     cut = np.array(cut).flatten().reshape((size_x,size_y,3))
-    INPUT = list(cut)
+    # INPUT = list(cut)
+    INPUT = cut
+
+    pom=[]
+    for x in INPUT:
+        row = []
+        for y in x:
+            if 255 in y:
+                row.append(255)
+            else:
+                row.append(0)
+        pom.append(row)
+
     RESULT = list(calculatedResult)  # TODO is type ok?
 
-    return mean_squared_error(INPUT, RESULT)
+    return mean_squared_error(pom, RESULT)
 
 
 def countStats():
@@ -309,12 +321,13 @@ def generateBinaryImage(image):
             else:
                 row.append(255)
         binary.append(row)
-        print("row "+str(x)+" calculated")
+        print("row " + str(x))
 
     return binary
 
 def countKNNStats():
-    files = ["0002","0003","0004","0005","0044"]
+    global COEF
+    files = ["0235","0236","0239","0240","0255","0291","0319","0324"]
     coefs = [[1, 10, 1],[1, 100, 1],[1, 100, 2],[1, 1000, 1],[1, 10000, 1],[1,100000, 1],[2,100000, 1]]
     for x in files:
         img_col = np.array(cv2.imread('test_img/im'+x+'.ppm'))
@@ -350,19 +363,13 @@ def countKNNStats():
                         true_negative+=1
             file = 'knn_stats/knn_stats_'+x+'.txt'
             file = open(file,"a")
-            
-            print(true_positive)
-            print(true_negative)
-            print(false_positive)
-            print(false_negative)
-            print(true_positive/(true_positive+true_negative))
-            print(true_positive/(true_positive+false_positive))
+
             false_positive = round(false_positive,5)
             false_negative = round(false_negative,5)
             recall = round(true_positive/(true_positive+true_negative),5)
             precision = round(true_positive/(true_positive+false_positive),5)
 
-            mse = calcDiffByArray(contours, "E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/test_img/im"+x+'.ppm')
+            mse = calcDiffByArray(contours, "/home/odys1528/PycharmProjects/funduscopy/test_img/im"+x+'.ppm')
             str_to_write = "COEF: "+str(COEF)+ \
             "\n"+"false positive: "+str(false_positive)+"\n"+ \
             "false negative: "+str(false_negative)+"\n"+ \
@@ -371,7 +378,9 @@ def countKNNStats():
             "mse:"+str(mse)+"\n\n"
             file.write(str_to_write)
             file.close()
-            exit(1)
+            print("all files: "+ str(files))
+            print("all coefs: "+str(coefs))
+            print("file: "+x+" coefs: "+str(COEF)+" calculated")
 
 if __name__ == "__main__":
     # main function for tests

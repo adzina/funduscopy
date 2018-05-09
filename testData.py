@@ -7,7 +7,7 @@ def readTrainingSet():
     files = [x[:-4] for x in files]
     trainingSet = []
     for file in files:
-        with open("E:/studia/Informatyka/semestr VI/Informatyka w Medycynie/funduscopy/test_results/" + file + ".txt",
+        with open("/home/odys1528/PycharmProjects/funduscopy/test_results/" + file + ".txt",
                   "r") as file:
             data = file.read()
             data = data[:-1]  # deleting last ] char

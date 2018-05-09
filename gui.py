@@ -88,6 +88,7 @@ class App(QWidget):
 
         self.img = Image.open(FILENAME)
         self.to_disp = np.array(self.img)
+
         self.imageView.setImage(self.to_disp)
 
         self.startButton.setEnabled(True)
@@ -96,30 +97,44 @@ class App(QWidget):
     @pyqtSlot()
     def startClickAction(self):
         global result_img
-        
-        off_x = 200
-        off_y = 200
-        size_x = 100
-        size_y = size_x
-        a = self.to_disp[off_y:off_y+size_y]
-        cut=[]
-        for i in a:
-            cut.append(i[off_x:off_x+size_x])
-        cut = np.array(cut).flatten().reshape((size_x,size_y,3))
-        binary = stats.generateBinaryImage(cut)
-        #binary = stats.contoursApprox(self.to_disp)
-        
+
+        tryb = 0
+
+        if tryb==0:
+            off_x = 0
+            off_y = 0
+            size_x = len(self.to_disp)
+            size_y = len(self.to_disp[0])
+            cut = self.to_disp
+            cut = np.array(cut).flatten().reshape((size_x,size_y,3))
+            binary = stats.contoursApprox(self.to_disp)
+
+        else:
+            off_x = 400
+            off_y = 300
+            size_x = 150
+            size_y = size_x
+            a = self.to_disp[off_y:off_y+size_y]
+            cut=[]
+            for i in a:
+                cut.append(i[off_x:off_x+size_x])
+            cut = np.array(cut).flatten().reshape((size_x,size_y,3))
+            binary = stats.generateBinaryImage(cut)
+
+
         self.startButton.setEnabled(False)
-		
+
         self.showImage(binary, off_x, off_y)
-		
+        
+
+
     def showImage(self, mask, offset_x, offset_y):
-	    for i in range(len(mask)):
-		    for j in range(len(mask[0])):
-			    if(mask[i][j]==255):
-				    self.to_disp[i+offset_x][j+offset_y] = np.array(list([255,255,255]))
-	    self.resultView.setImage(self.to_disp)
-		
+        for i in range(len(mask)):
+            for j in range(len(mask[0])):
+                if(mask[i][j]==255):
+                    self.to_disp[i+offset_x][j+offset_y] = np.array(list([255,255,255]))
+        self.resultView.setImage(self.to_disp)
+
     @pyqtSlot()
     def applyClickAction(self):
         self.applyButton.setEnabled(False)
